@@ -1,4 +1,56 @@
-async function copy(type) {
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل VIP کانفیگ</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white; font-family: Tahoma, sans-serif;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; margin: 0; padding: 20px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px;
+            padding: 20px; width: 100%; max-width: 350px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .btn {
+            display: flex; justify-content: space-between; align-items: center;
+            width: 100%; padding: 15px; margin: 10px 0;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px; color: white; cursor: pointer; transition: 0.3s;
+        }
+        .btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .badge { background: #4caf50; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <h2 style="text-align: center;">💎 پنل هوشمند</h2>
+        
+        <button class="btn" onclick="copy('all')">
+            <span>🌍 همه‌ی کشورها</span>
+            <span class="badge">AIO</span>
+        </button>
+
+        <button class="btn" onclick="copy('US')">
+            <span>🇺🇸 ایالات متحده</span>
+            <span class="badge">Config</span>
+        </button>
+
+        <button class="btn" onclick="copy('DE')">
+            <span>🇩🇪 آلمان</span>
+            <span class="badge">Config</span>
+        </button>
+
+        <p id="lastUpdate" style="font-size: 12px; color: #aaa; text-align: center; margin-top: 15px;"></p>
+    </div>
+
+    <script>
+        async function copy(type) {
             let fileName = (type === 'all') ? 'configs.txt' : type + '.txt';
             let url = `https://raw.githubusercontent.com/b33456386-cmd/configs/main/${fileName}`;
             
@@ -6,10 +58,13 @@ async function copy(type) {
                 const response = await fetch(url);
                 if (!response.ok) throw new Error();
                 const content = await response.text();
-                
                 await navigator.clipboard.writeText(content);
-                alert(type === 'all' ? "تمام کانفیگ‌ها کپی شدند! ✅" : `کانفیگ‌های ${type} کپی شدند! ✅`);
+                alert("با موفقیت کپی شد! ✅");
             } catch (err) {
-                alert("هنوز کانفیگی برای این بخش جمع نشده، دقایقی دیگر تلاش کنید.");
+                alert("این بخش هنوز توسط ربات آماده نشده است.");
             }
         }
+        document.getElementById('lastUpdate').innerText = "بروزرسانی: " + new Date().toLocaleTimeString('fa-IR');
+    </script>
+</body>
+</html>
