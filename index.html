@@ -3,68 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پنل هوشمند کانفیگ</title>
+    <title>V2Ray Pro Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #0f0c29; color: white; font-family: Tahoma, sans-serif; text-align: center; padding-top: 50px; }
-        .card { background: rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 15px; }
-        .btn-copy { background: #00d2ff; border: none; color: white; width: 100%; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 10px; }
-        .badge-count { background: #28a745; color: white; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; margin-left: 10px; }
+        :root { --main-bg: #f0f2f5; --card-bg: #ffffff; --text: #1c1e21; --primary: #465efb; }
+        [data-theme="dark"] { --main-bg: #18191a; --card-bg: #242526; --text: #e4e6eb; --primary: #00d2ff; }
+        
+        body { background: var(--main-bg); color: var(--text); font-family: system-ui; transition: 0.3s; padding: 20px; }
+        .header { background: linear-gradient(45deg, #465efb, #c259ff); color: white; border-radius: 25px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .search-input { background: var(--card-bg); border: 2px solid var(--primary); border-radius: 15px; padding: 15px; color: var(--text); width: 100%; margin-bottom: 20px; }
+        .country-card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.3s; display: flex; justify-content: space-between; align-items: center; }
+        .country-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .btn-copy { background: var(--primary); color: white; border: none; border-radius: 12px; padding: 8px 20px; font-weight: bold; }
+        .badge-count { background: rgba(70, 94, 251, 0.1); color: var(--primary); padding: 5px 12px; border-radius: 10px; font-size: 14px; font-weight: bold; }
+        .theme-toggle { position: absolute; top: 10px; left: 10px; cursor: pointer; font-size: 25px; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2 class="mb-4">💎 پنل هوشمند کانفیگ</h2>
-        
-        <div class="card">
-            <div class="d-flex justify-content-between align-items-center">
-                <span>🌎 همه کشورها</span>
-                <span id="count-ALL" class="badge-count">در حال بارگذاری...</span>
+<body data-theme="dark">
+    <div class="theme-toggle" onclick="document.body.getAttribute('data-theme')=='dark'?document.body.setAttribute('data-theme','light'):document.body.setAttribute('data-theme','dark')">🌓</div>
+    <div class="container" style="max-width: 600px;">
+        <div class="header text-center">
+            <h1>کانفیگ‌های رایگان V2Ray</h1>
+            <p>بروزرسانی خودکار هوشمند</p>
+        </div>
+
+        <input type="text" id="search" class="search-input" placeholder="جستجوی کشور (مثلاً آمریکا، US)..." onkeyup="filter()">
+
+        <div id="list">
             </div>
-            <button class="btn-copy" onclick="copyConfig('configs.txt')">کپی همه کانفیگ‌ها</button>
-        </div>
-
-        <div class="row">
-            <div class="col-6"><div class="card">🇺🇸 آمریکا <span id="count-US" class="badge-count">۰</span><button class="btn-copy" onclick="copyConfig('US.txt')">کپی</button></div></div>
-            <div class="col-6"><div class="card">🇩🇪 آلمان <span id="count-DE" class="badge-count">۰</span><button class="btn-copy" onclick="copyConfig('DE.txt')">کپی</button></div></div>
-            <div class="col-6"><div class="card">🇯🇵 ژاپن <span id="count-JP" class="badge-count">۰</span><button class="btn-copy" onclick="copyConfig('JP.txt')">کپی</button></div></div>
-            <div class="col-6"><div class="card">🇹🇷 ترکیه <span id="count-TR" class="badge-count">۰</span><button class="btn-copy" onclick="copyConfig('TR.txt')">کپی</button></div></div>
-            <div class="col-6"><div class="card">🇫🇮 فنلاند <span id="count-FI" class="badge-count">۰</span><button class="btn-copy" onclick="copyConfig('FI.txt')">کپی</button></div></div>
-            <div class="col-6"><div class="card">🇮🇷 ایران <span id="count-IR" class="badge-count">۰</span><button class="btn-copy" onclick="copyConfig('IR.txt')">کپی</button></div></div>
-        </div>
-
-        <a href="https://t.me/V2raying_config" class="btn btn-primary w-100 p-3 mt-3" style="border-radius:15px;">📢 عضویت در کانال تلگرام ما</a>
     </div>
 
     <script>
-        // تابع برای کپی کردن متن از فایل
-        async function copyConfig(fileName) {
-            try {
-                const response = await fetch(fileName);
-                if (!response.ok) throw new Error();
-                const text = await response.text();
-                await navigator.clipboard.writeText(text);
-                alert("کانفیگ‌ها با موفقیت کپی شدند! ✅");
-            } catch (err) {
-                alert("در حال جمع‌آوری کانفیگ... لطفا چند لحظه دیگر امتحان کنید.");
-            }
+        async function load() {
+            const res = await fetch('stats.json');
+            const stats = await res.json();
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+            
+            Object.keys(stats).forEach(code => {
+                const card = document.createElement('div');
+                card.className = 'country-card';
+                card.innerHTML = `
+                    <div>
+                        <span class="fw-bold">${code == 'ALL' ? '🌍 همه کانفیگ‌ها' : '📍 ' + code}</span>
+                        <span class="badge-count ms-2">${stats[code]} مورد</span>
+                    </div>
+                    <button class="btn-copy" onclick="copy('${code == 'ALL' ? 'configs' : code}.txt')">کپی لیست</button>
+                `;
+                list.appendChild(card);
+            });
         }
 
-        // تابع برای آپدیت اعداد از روی فایل stats.txt
-        async function updateStats() {
-            try {
-                const response = await fetch('stats.txt');
-                const data = await response.text();
-                const stats = data.split(',');
-                stats.forEach(s => {
-                    const [key, value] = s.split(':');
-                    const element = document.getElementById('count-' + key);
-                    if (element) element.innerText = value + " مورد";
-                });
-            } catch (e) { console.log("خطا در آپدیت آمار"); }
+        async function copy(file) {
+            const res = await fetch(file);
+            const text = await res.text();
+            navigator.clipboard.writeText(text);
+            alert("تمام کانفیگ‌های این دسته کپی شدند! ✅");
         }
-        setInterval(updateStats, 5000);
-        updateStats();
+
+        function filter() {
+            let val = document.getElementById('search').value.toUpperCase();
+            document.querySelectorAll('.country-card').forEach(card => {
+                card.innerText.toUpperCase().includes(val) ? card.style.display = 'flex' : card.style.display = 'none';
+            });
+        }
+        load();
     </script>
 </body>
 </html>
