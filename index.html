@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل کانفیگ</title>
+    <style>
+        body { background-color: #d1d5db; font-family: Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .header { color: #6d28d9; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .btn {
+            width: 100%; max-width: 380px; padding: 18px; margin: 10px 0; border: none; border-radius: 30px;
+            color: white; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 0 25px;
+        }
+        /* رنگ‌های مشابه عکس نمونه شما */
+        .btn-all { background: linear-gradient(to right, #f97316, #10b981); }
+        .btn-aus { background: linear-gradient(to right, #059669, #db2777); }
+        .btn-bra { background: linear-gradient(to right, #2563eb, #7c3aed); }
+        .btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+    <div class="header">کانفیگ‌های رایگان V2Ray</div>
+    <button class="btn btn-all" onclick="copy('config_link_here')"><span>همه کانفیگ‌ها 🌍</span><span>📋</span></button>
+    <button class="btn btn-aus" onclick="copy('vless://example_australia')"><span>Australia 🇦🇺</span><span>📋</span></button>
+    <button class="btn btn-bra" onclick="copy('vmess://example_brazil')"><span>Brazil 🇧🇷</span><span>📋</span></button>
+
+    <script>
+        function copy(text) {
+            navigator.clipboard.writeText(text);
+            alert("کپی شد! ✅");
+        }
+    </script>
+</body>
+</html>
