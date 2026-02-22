@@ -2,61 +2,59 @@ import requests
 import re
 import base64
 
-# منابع جدید و تست شده که همین الان دیتای فعال دارند
+# این منابع مستقیماً به مخازن بزرگ متصل هستند
 SOURCES = [
     "https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/vless/base64",
     "https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/vmess/base64",
     "https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/trojan/base64",
     "https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/All_Configs_Sub.txt",
-    "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/Eternity"
+    "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/Eternity",
+    "https://raw.githubusercontent.com/t-v2ray/v2ray-config/main/All_Configs_Sub.txt"
 ]
 
 def grab_configs():
     all_configs = []
     for url in SOURCES:
         try:
-            response = requests.get(url, timeout=20)
-            content = response.text
+            res = requests.get(url, timeout=20)
+            text = res.text
+            # اگر محتوا کدگذاری شده بود، بازش کن
+            if "://" not in text[:50]:
+                try:
+                    text = base64.b64decode(text).decode('utf-8')
+                except: pass
             
-            # رمزگشایی اگر کل صفحه Base64 بود
-            try:
-                decoded = base64.b64decode(content).decode('utf-8')
-                if "://" in decoded: content = decoded
-            except: pass
-            
-            # استخراج تمام پروتکل‌ها
-            found = re.findall(r'(vless|vmess|trojan|ss)://[^\s<"\'|]+', content)
+            # استخراج لینک‌ها
+            found = re.findall(r'(vless|vmess|trojan|ss)://[^\s<"\'|]+', text)
             for proto, rest in found:
                 all_configs.append(f"{proto}://{rest}")
         except: continue
     
     unique_list = list(set(all_configs))
     
-    # فیلتر هوشمند برای ۶ کشور
+    # تفکیک کشورها (بر اساس کلمات کلیدی در نام کانفیگ)
     countries = {
-        "US": ["US", "USA", "UNITED STATES"],
+        "US": ["US", "USA", "UNITED"],
         "DE": ["DE", "GERMANY", "FRANKFURT"],
         "JP": ["JP", "JAPAN", "TOKYO"],
         "TR": ["TR", "TURKEY", "ISTANBUL"],
         "FI": ["FI", "FINLAND", "HELSINKI"],
-        "IR": ["IR", "IRAN", "MCI", "IRANCELL"]
+        "IR": ["IR", "IRAN", "MCI", "MTN"]
     }
     
-    final_stats = {"ALL": len(unique_list)}
+    counts = {"ALL": len(unique_list)}
     
-    # ذخیره فایل هر کشور
     for code, keywords in countries.items():
         filtered = [c for c in unique_list if any(x in c.upper() for x in keywords)]
-        final_stats[code] = len(filtered)
+        counts[code] = len(filtered)
         with open(f"{code}.txt", "w", encoding="utf-8") as f:
             f.write("\n".join(filtered[:100]))
 
-    # ذخیره فایل اصلی
     with open("configs.txt", "w", encoding="utf-8") as f:
         f.write("\n".join(unique_list))
     
-    # آپدیت دقیق آمار برای سایت
-    stats_str = f"ALL:{final_stats['ALL']},US:{final_stats['US']},DE:{final_stats['DE']},JP:{final_stats['JP']},TR:{final_stats['TR']},FI:{final_stats['FI']},IR:{final_stats['IR']}"
+    # آپدیت آمار برای سایت
+    stats_str = f"ALL:{counts['ALL']},US:{counts['US']},DE:{counts['DE']},JP:{counts['JP']},TR:{counts['TR']},FI:{counts['FI']},IR:{counts['IR']}"
     with open("stats.txt", "w", encoding="utf-8") as f:
         f.write(stats_str)
 
