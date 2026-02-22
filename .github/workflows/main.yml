@@ -1,0 +1,34 @@
+name: Update Configs
+
+on:
+  workflow_dispatch: # برای اجرای دستی
+  schedule:
+    - cron: '0 */3 * * *' # اجرای خودکار هر ۳ ساعت
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run grabber
+        run: python grabber.py
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Update configs" || exit 0
+          git push
