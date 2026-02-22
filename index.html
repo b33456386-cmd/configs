@@ -1,73 +1,38 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V2Ray Pro Panel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root { --main-bg: #f0f2f5; --card-bg: #ffffff; --text: #1c1e21; --primary: #465efb; }
-        [data-theme="dark"] { --main-bg: #18191a; --card-bg: #242526; --text: #e4e6eb; --primary: #00d2ff; }
-        
-        body { background: var(--main-bg); color: var(--text); font-family: system-ui; transition: 0.3s; padding: 20px; }
-        .header { background: linear-gradient(45deg, #465efb, #c259ff); color: white; border-radius: 25px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .search-input { background: var(--card-bg); border: 2px solid var(--primary); border-radius: 15px; padding: 15px; color: var(--text); width: 100%; margin-bottom: 20px; }
-        .country-card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.3s; display: flex; justify-content: space-between; align-items: center; }
-        .country-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-        .btn-copy { background: var(--primary); color: white; border: none; border-radius: 12px; padding: 8px 20px; font-weight: bold; }
-        .badge-count { background: rgba(70, 94, 251, 0.1); color: var(--primary); padding: 5px 12px; border-radius: 10px; font-size: 14px; font-weight: bold; }
-        .theme-toggle { position: absolute; top: 10px; left: 10px; cursor: pointer; font-size: 25px; }
-    </style>
-</head>
-<body data-theme="dark">
-    <div class="theme-toggle" onclick="document.body.getAttribute('data-theme')=='dark'?document.body.setAttribute('data-theme','light'):document.body.setAttribute('data-theme','dark')">🌓</div>
-    <div class="container" style="max-width: 600px;">
-        <div class="header text-center">
-            <h1>کانفیگ‌های رایگان V2Ray</h1>
-            <p>بروزرسانی خودکار هوشمند</p>
-        </div>
+<div id="card-container" class="mt-4"></div>
 
-        <input type="text" id="search" class="search-input" placeholder="جستجوی کشور (مثلاً آمریکا، US)..." onkeyup="filter()">
+<script>
+    async function loadData() {
+        try {
+            // آپدیت عدد کل کانفیگ‌ها
+            const resStats = await fetch('stats.txt');
+            const statsText = await resStats.text();
+            const total = statsText.split(',')[0].split(':')[1];
+            document.querySelector('.badge-count').innerText = total + " مورد";
 
-        <div id="list">
-            </div>
-    </div>
+            // نمایش کارت‌ها مثل نمونه‌ای که فرستادی
+            const resData = await fetch('data.json');
+            const configs = await resData.json();
+            const container = document.getElementById('card-container');
+            container.innerHTML = '';
 
-    <script>
-        async function load() {
-            const res = await fetch('stats.json');
-            const stats = await res.json();
-            const list = document.getElementById('list');
-            list.innerHTML = '';
-            
-            Object.keys(stats).forEach(code => {
+            configs.forEach((conf, index) => {
                 const card = document.createElement('div');
-                card.className = 'country-card';
+                card.className = 'country-card d-block text-start mb-3';
                 card.innerHTML = `
-                    <div>
-                        <span class="fw-bold">${code == 'ALL' ? '🌍 همه کانفیگ‌ها' : '📍 ' + code}</span>
-                        <span class="badge-count ms-2">${stats[code]} مورد</span>
-                    </div>
-                    <button class="btn-copy" onclick="copy('${code == 'ALL' ? 'configs' : code}.txt')">کپی لیست</button>
+                    <div class="small opacity-50 mb-2">Config #${index + 1}</div>
+                    <div class="text-truncate p-2 bg-dark rounded mb-2" style="font-size:10px;">${conf}</div>
+                    <button class="btn btn-sm btn-primary w-100" onclick="copyText('${conf}')">کپی این کانفیگ</button>
                 `;
-                list.appendChild(card);
+                container.appendChild(card);
             });
-        }
+        } catch (e) { console.log("در حال بارگذاری..."); }
+    }
 
-        async function copy(file) {
-            const res = await fetch(file);
-            const text = await res.text();
-            navigator.clipboard.writeText(text);
-            alert("تمام کانفیگ‌های این دسته کپی شدند! ✅");
-        }
-
-        function filter() {
-            let val = document.getElementById('search').value.toUpperCase();
-            document.querySelectorAll('.country-card').forEach(card => {
-                card.innerText.toUpperCase().includes(val) ? card.style.display = 'flex' : card.style.display = 'none';
-            });
-        }
-        load();
-    </script>
-</body>
-</html>
+    function copyText(text) {
+        navigator.clipboard.writeText(text);
+        alert("کپی شد! ✅");
+    }
+    
+    setInterval(loadData, 10000);
+    loadData();
+</script>
