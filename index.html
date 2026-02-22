@@ -1,46 +1,15 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پنل کانفیگ رایگان</title>
-    <style>
-        body { font-family: Tahoma, sans-serif; background-color: #f0f2f5; text-align: center; padding: 20px; }
-        .btn { display: block; width: 100%; max-width: 300px; margin: 10px auto; padding: 15px; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; text-decoration: none; }
-        .btn-all { background: linear-gradient(90deg, #ff8c00, #4caf50); }
-        .last-update { margin-top: 20px; color: #666; font-size: 0.9em; }
-    </style>
-</head>
-<body>
-    <h1 style="color: #6a1b9a;">کانفیگ‌های رایگان V2Ray</h1>
-    
-    <button class="btn btn-all" onclick="copy('link_all')">🌍 همه کانفیگ‌ها (کپی)</button>
-    
-    <div class="last-update" id="lastUpdate">در حال دریافت تاریخ...</div>
-
-    <script>
-        async function copy(text) {
-            let content = text;
-            if(text === 'link_all') {
-                try {
-                    const response = await fetch('configs.txt');
-                    if (!response.ok) throw new Error();
-                    content = await response.text();
-                } catch (err) {
-                    alert("کانفیگ‌ها هنوز آماده نیستند، لحظاتی دیگر تلاش کنید.");
-                    return;
-                }
-            }
+async function copy(type) {
+            let fileName = (type === 'all') ? 'configs.txt' : type + '.txt';
+            let url = `https://raw.githubusercontent.com/b33456386-cmd/configs/main/${fileName}`;
             
-            navigator.clipboard.writeText(content).then(() => {
-                alert("با موفقیت کپی شد! ✅");
-            }).catch(err => {
-                alert("خطا در کپی! ❌");
-            });
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error();
+                const content = await response.text();
+                
+                await navigator.clipboard.writeText(content);
+                alert(type === 'all' ? "تمام کانفیگ‌ها کپی شدند! ✅" : `کانفیگ‌های ${type} کپی شدند! ✅`);
+            } catch (err) {
+                alert("هنوز کانفیگی برای این بخش جمع نشده، دقایقی دیگر تلاش کنید.");
+            }
         }
-
-        const now = new Date();
-        document.getElementById('lastUpdate').innerText = "آخرین آپدیت پنل: " + now.toLocaleString('fa-IR');
-    </script>
-</body>
-</html>
