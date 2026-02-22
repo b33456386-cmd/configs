@@ -1,0 +1,26 @@
+name: Update Configs
+on:
+  schedule:
+    - cron: '0 */2 * * *' # هر دو ساعت یکبار اجرا شود
+  workflow_dispatch: # برای اجرای دستی
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Run grabber
+        run: python grabber.py
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add configs.txt
+          git commit -m "Update configs automatically" || exit 0
+          git push
