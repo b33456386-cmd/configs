@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پنل هوشمند کانفیگ</title>
+    <title>پنل اختصاصی V2raying</title>
     <style>
         body {
             background: #0f0c29; color: white; font-family: Tahoma, sans-serif;
             display: flex; flex-direction: column; align-items: center; padding: 20px;
+            min-height: 100vh; margin: 0;
         }
         .glass-card {
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px;
             padding: 25px; width: 100%; max-width: 380px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            margin-top: 50px;
         }
         .btn {
             display: flex; justify-content: space-between; align-items: center;
@@ -24,36 +26,37 @@
         .badge { background: #4caf50; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; }
         .tg-btn {
             background: #0088cc; color: white; text-decoration: none; display: block;
-            text-align: center; padding: 12px; border-radius: 15px; margin-top: 20px; font-weight: bold;
-            transition: 0.3s;
+            text-align: center; padding: 15px; border-radius: 15px; margin-top: 20px; font-weight: bold;
         }
-        .tg-btn:hover { background: #00aaff; box-shadow: 0 0 15px #0088cc; }
     </style>
 </head>
 <body>
+
     <div class="glass-card">
-        <h2 style="text-align: center; margin-top: 0;">💎 پنل هوشمند</h2>
+        <h2 style="text-align: center; margin-bottom: 25px;">💎 پنل هوشمند کانفیگ</h2>
         
         <button class="btn" onclick="copy('all')">
             <span>🌍 همه‌ی کشورها</span>
-            <span class="badge" id="count-all">0 مورد</span>
+            <span class="badge" id="count-all">...</span>
         </button>
 
         <button class="btn" onclick="copy('US')">
             <span>🇺🇸 ایالات متحده</span>
-            <span class="badge" id="count-US">0 مورد</span>
+            <span class="badge" id="count-US">...</span>
         </button>
 
         <button class="btn" onclick="copy('DE')">
             <span>🇩🇪 آلمان</span>
-            <span class="badge" id="count-DE">0 مورد</span>
+            <span class="badge" id="count-DE">...</span>
         </button>
 
         <a href="https://t.me/V2raying_config" target="_blank" class="tg-btn">📢 عضویت در کانال تلگرام ما</a>
-        <p id="lastUpdate" style="font-size: 10px; color: #aaa; text-align: center; margin-top: 15px;"></p>
+        
+        <p id="lastUpdate" style="font-size: 10px; color: #777; text-align: center; margin-top: 20px;"></p>
     </div>
 
     <script>
+        // دریافت آمار تعداد کانفیگ‌ها از فایل stats.txt
         async function updateStats() {
             try {
                 const res = await fetch('https://raw.githubusercontent.com/b33456386-cmd/configs/main/stats.txt');
@@ -62,9 +65,10 @@
                 document.getElementById('count-all').innerText = (stats.ALL || '0') + " مورد";
                 document.getElementById('count-US').innerText = (stats.US || '0') + " مورد";
                 document.getElementById('count-DE').innerText = (stats.DE || '0') + " مورد";
-            } catch (e) { console.log("Stats not ready yet"); }
+            } catch (e) { console.log("آمار هنوز آپدیت نشده"); }
         }
 
+        // تابع کپی کردن کانفیگ‌ها
         async function copy(type) {
             let fileName = (type === 'all') ? 'configs.txt' : type + '.txt';
             let url = `https://raw.githubusercontent.com/b33456386-cmd/configs/main/${fileName}`;
@@ -73,12 +77,12 @@
                 const content = await res.text();
                 if (content.length < 10) throw new Error();
                 await navigator.clipboard.writeText(content);
-                alert("کپی شد! ✅ حالا در نرم‌افزار خود Paste کنید.");
-            } catch (e) { alert("هنوز کانفیگی برای این بخش جمع‌آوری نشده، لحظاتی دیگر تلاش کنید."); }
+                alert("کانفیگ‌ها با موفقیت کپی شدند! ✅");
+            } catch (e) { alert("در حال جمع‌آوری کانفیگ... لطفا چند لحظه دیگر امتحان کنید."); }
         }
 
         updateStats();
-        document.getElementById('lastUpdate').innerText = "بروزرسانی هوشمند: " + new Date().toLocaleTimeString('fa-IR');
+        document.getElementById('lastUpdate').innerText = "بروزرسانی خودکار فعال است";
     </script>
 </body>
 </html>
